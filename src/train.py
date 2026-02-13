@@ -1,12 +1,13 @@
-print("Training started...")
-
 import os
 import numpy as np
 from feature_extraction import extract_features
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 import joblib
+
+print("Training started...")
 
 X, y = [], []
 
@@ -19,8 +20,6 @@ for actor in os.listdir(dataset_path):
         file_path = os.path.join(actor_path, file)
         print("Processing:", file_path)
 
-        scaler = StandardScaler()
-        X = scaler.fit_transform(X)
         emotion = file.split("-")[2]
         X.append(extract_features(file_path))
         y.append(emotion)
@@ -28,15 +27,20 @@ for actor in os.listdir(dataset_path):
 
 X = np.array(X)
 
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+joblib.dump(scaler, "../models/scaler.pkl")
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2
 )
 
-model = SVC(kernel="linear")
+model = SVC(kernel="linear", probability=True)
 model.fit(X_train, y_train)
 
 
 
 print("Accuracy:", model.score(X_test, y_test))
-joblib.dump(scaler, "../models/scaler.pkl")
+
 joblib.dump(model, "../models/emotion_model.pkl")
