@@ -1,6 +1,7 @@
 {
-    "venvPath": ".",
+    "venvPath": "d:/Github/emotion_detection",
     "venv": ".venv",
+    "pythonVersion": "3.13",
     "extraPaths": [
         "src"
     ]
