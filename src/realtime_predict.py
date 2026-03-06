@@ -1,13 +1,24 @@
 from colorama import init, Fore, Style
 init()
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import sounddevice as sd
 import numpy as np
 import librosa
 import joblib
 
+# Get the absolute path to the project root directory
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Load model
-model = joblib.load("../models/emotion_model.pkl")
-scaler = joblib.load("../models/scaler.pkl")
+model_path = os.path.join(project_root, "models", "emotion_model.pkl")
+scaler_path = os.path.join(project_root, "models", "scaler.pkl")
+
+model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
 emotion_map = {
     "01": ("Neutral", "😐"),
@@ -28,8 +39,8 @@ def record_audio(duration=3, sr=22050):
     return audio.flatten()
 
 def is_silence(audio, threshold=0.01):
-    volume = np.linalg.norm(audio)
-    return volume < threshold
+    rms_volume = np.sqrt(np.mean(audio**2))
+    return rms_volume < threshold
 
 def extract_features(audio, sr=22050):
     mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=40)
@@ -49,8 +60,15 @@ while True:
         print("⚠️ No speech detected. Try speaking louder.")
         continue
 
-    # Extract features
-    features = extract_features(audio)
+    # Trim silence (strip background noise)
+    trimmed_audio, _ = librosa.effects.trim(audio, top_db=30)
+    
+    if len(trimmed_audio) < 22050 * 0.5: # Reject if less than 0.5s of actual speech
+        print("⚠️ Audio too short after trimming silence. Please speak a full word.")
+        continue
+
+    # Extract features from the active speech only
+    features = extract_features(trimmed_audio)
 
     # Convert to proper shape (1 sample, 40 features)
     features = np.array(features).reshape(1, -1)
@@ -85,8 +103,8 @@ while True:
     color = color_map.get(emotion, Fore.WHITE)
 
     print("\n==============================")
-    print(color + f"✅ Detected Emotion: {emotion} {emoji}" + Style.RESET_ALL)
-    print(color + f"🔥 Confidence: {confidence:.1f}%" + Style.RESET_ALL)
+    print(f"{color}✅ Detected Emotion: {emotion} {emoji}{Style.RESET_ALL}")
+    print(f"{color}🔥 Confidence: {confidence:.1f}%{Style.RESET_ALL}")
     print("==============================")
 
 

@@ -1,4 +1,8 @@
 import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import numpy as np
 from feature_extraction import extract_features
 from sklearn.preprocessing import StandardScaler
@@ -11,7 +15,8 @@ print("Training started...")
 
 X, y = [], []
 
-dataset_path = "../dataset/RAVDESS"
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dataset_path = os.path.join(project_root, "dataset", "RAVDESS")
 
 for actor in os.listdir(dataset_path):
     actor_path = os.path.join(dataset_path, actor)
@@ -27,14 +32,16 @@ for actor in os.listdir(dataset_path):
 
 X = np.array(X)
 
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
-joblib.dump(scaler, "../models/scaler.pkl")
-
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2
 )
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test) # Transform test subset as well
+
+scaler_path = os.path.join(project_root, "models", "scaler.pkl")
+joblib.dump(scaler, scaler_path)
 
 model = SVC(kernel="linear", probability=True)
 model.fit(X_train, y_train)
@@ -43,4 +50,5 @@ model.fit(X_train, y_train)
 
 print("Accuracy:", model.score(X_test, y_test))
 
-joblib.dump(model, "../models/emotion_model.pkl")
+model_path = os.path.join(project_root, "models", "emotion_model.pkl")
+joblib.dump(model, model_path)
