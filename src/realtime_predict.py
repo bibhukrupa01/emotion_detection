@@ -42,10 +42,7 @@ def is_silence(audio, threshold=0.01):
     rms_volume = np.sqrt(np.mean(audio**2))
     return rms_volume < threshold
 
-def extract_features(audio, sr=22050):
-    mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=40)
-    return np.mean(mfcc.T, axis=0)
-
+from feature_extraction import extract_features_from_audio
 while True:
     choice = input("\nPress ENTER to record (or type q to quit): ")
 
@@ -68,7 +65,7 @@ while True:
         continue
 
     # Extract features from the active speech only
-    features = extract_features(trimmed_audio)
+    features = extract_features_from_audio(trimmed_audio, sr=22050)
 
     # Convert to proper shape (1 sample, 40 features)
     features = np.array(features).reshape(1, -1)

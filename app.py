@@ -3,7 +3,7 @@ import sounddevice as sd
 import numpy as np
 import librosa
 import joblib
-
+from src.feature_extraction import extract_features_from_audio
 model = joblib.load("models/emotion_model.pkl")
 scaler = joblib.load("models/scaler.pkl")
 
@@ -28,8 +28,7 @@ if st.button("Record Audio"):
     sd.wait()
 
     audio = audio.flatten()
-    mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=40)
-    features = np.mean(mfcc.T, axis=0)
+    features = extract_features_from_audio(audio, sr=sr)
     features = features.reshape(1, -1)
     
     features = scaler.transform(features)

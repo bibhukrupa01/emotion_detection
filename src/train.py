@@ -7,8 +7,7 @@ import numpy as np
 from src.feature_extraction import extract_features
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
 import joblib
 
 print("Training started...")
@@ -43,7 +42,7 @@ X_test = scaler.transform(X_test) # Transform test subset as well
 scaler_path = os.path.join(project_root, "models", "scaler.pkl")
 joblib.dump(scaler, scaler_path)
 
-model = SVC(kernel="linear", probability=True)
+model = MLPClassifier(alpha=0.01, batch_size=256, epsilon=1e-08, hidden_layer_sizes=(300,), learning_rate='adaptive', max_iter=500)
 model.fit(X_train, y_train)
 
 
