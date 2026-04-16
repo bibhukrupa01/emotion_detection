@@ -51,5 +51,5 @@ for expected, fpath in files_to_test:
     pred = model.predict(features)[0]
     predicted_emotion = emotion_map.get(pred, "Unknown")
     
-    match_status = "✅" if predicted_emotion == expected else "❌"
+    match_status = "PASS" if predicted_emotion == expected else "FAIL"
     print(f"File ({expected}): Predicted {predicted_emotion} {match_status}")
