@@ -11,7 +11,7 @@ def extract_features_from_audio(audio, sr):
     chroma = librosa.feature.chroma_stft(S=stft, sr=sr)
     chroma_mean = np.mean(chroma.T, axis=0)
     
-    # Extract Mel Spectrogram
+    # Extractd Mel Spectrogram
     mel = librosa.feature.melspectrogram(y=audio, sr=sr)
     mel_mean = np.mean(mel.T, axis=0)
     

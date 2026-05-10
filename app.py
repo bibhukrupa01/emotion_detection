@@ -34,7 +34,7 @@ emotion_map = {
     "08": ("Surprised", "😲", "#fb923c", "Unexpected stimulus detected"),
 }
 
-# ── Premium CSS ──────────────────────────────────────────────────────────────
+# ── CSS ──────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
     /* ── Google Fonts ── */
